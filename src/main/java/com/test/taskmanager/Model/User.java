@@ -23,10 +23,10 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(referencedColumnName = "roleId")
     private Role role;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(referencedColumnName = "userStatusId")
     private UserStatus status;
 

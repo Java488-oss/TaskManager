@@ -3,9 +3,13 @@ package com.test.taskmanager.Controllers;
 import com.test.taskmanager.Config.JwtUtil;
 import com.test.taskmanager.Dto.AuthRequest;
 import com.test.taskmanager.Dto.AuthResponse;
+import com.test.taskmanager.Model.Role;
 import com.test.taskmanager.Model.User;
+import com.test.taskmanager.Model.UserStatus;
 import com.test.taskmanager.Service.CostomUserDetailsService;
+import com.test.taskmanager.Service.RoleService;
 import com.test.taskmanager.Service.UserService;
+import com.test.taskmanager.Service.UserStatusService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +27,16 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private BCryptPasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final UserStatusService userStatusService;
 
     public AuthController(CostomUserDetailsService costomUserDetailsService,
-                          JwtUtil jwtUtil, UserService userService) {
+                          JwtUtil jwtUtil, UserService userService, RoleService roleService, UserStatusService userStatusService) {
         this.costomUserDetailsService = costomUserDetailsService;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.roleService = roleService;
+        this.userStatusService = userStatusService;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -46,6 +54,36 @@ public class AuthController {
             final String token = jwtUtil.generateToken(user);
 
             return ResponseEntity.ok(new AuthResponse(token));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getStackTrace().toString());
+        }
+    }
+
+    @PostMapping("/registration")
+    public ResponseEntity<?> registration(@RequestBody User user) {
+
+        try {
+
+            User emailIsExists = userService.findByEmail(user.getEmail());
+
+            if(emailIsExists==null){
+                // Загружаем существующую роль
+                Role role = roleService.findByRoleId(user.getRole().getRoleId());
+                // Загружаем статус пользователя
+                UserStatus status = userStatusService.findByUserStatusId(user.getStatus().getUserStatusId());
+
+                user.setRole(role);
+                user.setStatus(status);
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+                userService.save(user);
+
+                final String token = jwtUtil.generateToken(user);
+                return ResponseEntity.ok(new AuthResponse(token));
+            }
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getStackTrace().toString());

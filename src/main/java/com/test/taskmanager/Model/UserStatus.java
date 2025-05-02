@@ -5,34 +5,42 @@ import jakarta.persistence.Id;
 
 @Entity
 public class UserStatus {
+
     @Id
-    private Long UserStatusId;
-    private String UserStatusName;
+    private Long userStatusId;
 
+    private String userStatusName;
+
+    // Конструктор с двумя параметрами
     public UserStatus(Long userStatusId, String userStatusName) {
-        UserStatusId = userStatusId;
-        UserStatusName = userStatusName;
-    }
-    public UserStatus(Long userStatusId) {
-        UserStatusId = userStatusId;
+        this.userStatusId = userStatusId;
+        this.userStatusName = userStatusName;
     }
 
+    // Конструктор с одним параметром (если нужен)
+    public UserStatus(Long userStatusId) {
+        this.userStatusId = userStatusId;
+    }
+
+    // Конструктор по умолчанию (обязательно нужен для JPA)
     public UserStatus() {
     }
 
+    // Геттеры и сеттеры
     public Long getUserStatusId() {
-        return UserStatusId;
+        return userStatusId;
     }
 
     public void setUserStatusId(Long userStatusId) {
-        UserStatusId = userStatusId;
+        this.userStatusId = userStatusId;
     }
 
     public String getUserStatusName() {
-        return UserStatusName;
+        return userStatusName;
     }
 
     public void setUserStatusName(String userStatusName) {
-        UserStatusName = userStatusName;
+        this.userStatusName = userStatusName;
     }
 }
+

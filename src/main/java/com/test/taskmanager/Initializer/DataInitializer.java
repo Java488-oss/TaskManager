@@ -7,6 +7,7 @@ import com.test.taskmanager.Repository.RoleRepository;
 import com.test.taskmanager.Repository.UserRepository;
 import com.test.taskmanager.Repository.UserStatusRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class DataInitializer implements CommandLineRunner {
     private final UserStatusRepository userStatusRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private BCryptPasswordEncoder passwordEncoder;
 
     public DataInitializer(UserStatusRepository userStatusRepository, RoleRepository roleRepository, UserRepository userRepository) {
         this.userStatusRepository = userStatusRepository;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -43,7 +46,7 @@ public class DataInitializer implements CommandLineRunner {
 
         if(userRepository.count() == 0){
             userRepository.saveAll(List.of(
-               new User("Email", "Name", "Password", "FirstName", "LastName", new Role(1L), new UserStatus(1L))
+               new User("email", "name", passwordEncoder.encode("pass"), "firstName", "lastName", new Role(1L), new UserStatus(1L))
             ));
         }
     }
