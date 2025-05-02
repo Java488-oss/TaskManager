@@ -3,14 +3,11 @@ package com.test.taskmanager.Controllers;
 import com.test.taskmanager.Config.JwtUtil;
 import com.test.taskmanager.Dto.AuthRequest;
 import com.test.taskmanager.Dto.AuthResponse;
-import com.test.taskmanager.Model.Role;
 import com.test.taskmanager.Model.User;
-import com.test.taskmanager.Model.UserStatus;
 import com.test.taskmanager.Service.CostomUserDetailsService;
 import com.test.taskmanager.Service.RoleService;
 import com.test.taskmanager.Service.UserService;
 import com.test.taskmanager.Service.UserStatusService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,7 +42,9 @@ public class AuthController {
 
         try {
 
-            final User user = userService.findByUserName(request.getEmail());
+            final User user = userService.findByEmail(request.getEmail());
+
+            System.out.println(user.getUserId());
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
