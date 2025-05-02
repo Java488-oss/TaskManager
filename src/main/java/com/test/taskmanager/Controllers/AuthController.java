@@ -68,13 +68,7 @@ public class AuthController {
             User emailIsExists = userService.findByEmail(user.getEmail());
 
             if(emailIsExists==null){
-                // Загружаем существующую роль
-                Role role = roleService.findByRoleId(user.getRole().getRoleId());
-                // Загружаем статус пользователя
-                UserStatus status = userStatusService.findByUserStatusId(user.getStatus().getUserStatusId());
 
-                user.setRole(role);
-                user.setStatus(status);
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
 
                 userService.save(user);
@@ -90,17 +84,5 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/testtoken")
-    public ResponseEntity<?> handlePostRequest(HttpServletRequest request, @RequestBody String body) {
-        User user = jwtUtil.getUserFromToken(request);
-
-        if (user != null) {
-
-            return ResponseEntity.status(HttpStatus.OK).body("Valid token "+ user.getRole().getRoleName() + " body "+body);
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization header is missing or invalid");
-
-    }
 }
 

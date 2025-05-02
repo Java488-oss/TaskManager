@@ -1,7 +1,11 @@
 package com.test.taskmanager.Controllers;
 
+import com.test.taskmanager.Config.JwtUtil;
 import com.test.taskmanager.Model.User;
 import com.test.taskmanager.Service.CostomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,15 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    private final CostomUserDetailsService costomUserDetailsService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(CostomUserDetailsService costomUserDetailsService) {
-        this.costomUserDetailsService = costomUserDetailsService;
+    public UserController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/")
-    public String registerUser(@RequestBody User test) {
-        final UserDetails userDetails = costomUserDetailsService.loadUserByUsername("name");
-        return "Welcome ";
+    @PostMapping("/testtoken")
+    public ResponseEntity<?> handlePostRequest(HttpServletRequest request, @RequestBody String body) {
+        User user = jwtUtil.getUserFromToken(request);
+
+        if (user != null) {
+
+            return ResponseEntity.status(HttpStatus.OK).body("Valid token "+ user.getRole().getRoleName() + " body "+body);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization header is missing or invalid");
+
     }
 }
